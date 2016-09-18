@@ -7,7 +7,7 @@
     <item>
         <bitmap
             android:gravity="center"
-            android:src="@drawable/tfslogo"/>
+            android:src="@drawable/tfs_logo"/>
     </item>
 
 </layer-list>

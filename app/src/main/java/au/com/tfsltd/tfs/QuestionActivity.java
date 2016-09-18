@@ -1,19 +1,19 @@
 package au.com.tfsltd.tfs;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.CardView;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.Map;
 
@@ -36,11 +36,13 @@ public class QuestionActivity extends AppCompatActivity {
         final TextView questionView = (TextView) findViewById(R.id.question);
         final LinearLayout answersView = (LinearLayout) findViewById(R.id.answers);
 
-        Firebase ref = new Firebase(Constants.FIREBASE + path);
-        ref.addValueEventListener(new ValueEventListener() {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference mFirebaseRef = database.getReference(path);
+
+        mFirebaseRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                Map question = (Map)snapshot.getValue();
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Map question = (Map)dataSnapshot.getValue();
 
                 questionView.setText((String)question.get(Constants.FIELD_TEXT));
 
@@ -51,9 +53,10 @@ public class QuestionActivity extends AppCompatActivity {
                     answersView.addView(createAnswerButton(answer, i));
                 }
             }
+
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
-                System.out.println("The read failed: " + firebaseError.getMessage());
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getMessage());
             }
         });
     }

@@ -2,15 +2,15 @@ package au.com.tfsltd.tfs;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 import java.util.Map;
@@ -34,11 +34,13 @@ public class DetailActivity extends AppCompatActivity {
         final TextView detailView = (TextView) findViewById(R.id.detail);
         final LinearLayout photosLayout = (LinearLayout) findViewById(R.id.photos);
 
-        Firebase ref = new Firebase(Constants.FIREBASE + path);
-        ref.addValueEventListener(new ValueEventListener() {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference mFirebaseRef = database.getReference(path);
+
+        mFirebaseRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                Map detail = (Map)snapshot.getValue();
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Map detail = (Map)dataSnapshot.getValue();
 
                 detailView.setText((String)detail.get(Constants.FIELD_DETAIL));
 
@@ -47,9 +49,10 @@ public class DetailActivity extends AppCompatActivity {
                     photosLayout.addView(createPhotoImage(photoUrl));
                 }
             }
+
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
-                System.out.println("The read failed: " + firebaseError.getMessage());
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getMessage());
             }
         });
     }

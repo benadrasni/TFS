@@ -22,8 +22,7 @@
             android:layout_height="wrap_content"
             android:padding="@dimen/question_margin"
             android:gravity="center"
-            android:textSize="@dimen/question_text_size"
-            android:text="Hello World!"/>
+            android:textSize="@dimen/question_text_size"/>
 
     </android.support.v7.widget.CardView>
 
