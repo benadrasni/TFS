@@ -1,0 +1,66 @@
+package au.com.tfsltd.tfs;
+
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Detail activity
+ *
+ * Created by adrian on 17.9.2016.
+ */
+public class DetailActivity extends AppCompatActivity {
+
+    private String path;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        path = getIntent().getExtras().getString(Constants.PATH);
+
+        setContentView(R.layout.activity_detail);
+
+        final TextView detailView = (TextView) findViewById(R.id.detail);
+        final LinearLayout photosLayout = (LinearLayout) findViewById(R.id.photos);
+
+        Firebase ref = new Firebase(Constants.FIREBASE + path);
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                Map detail = (Map)snapshot.getValue();
+
+                detailView.setText((String)detail.get(Constants.FIELD_DETAIL));
+
+                List<String> photos = (List<String>)detail.get(Constants.FIELD_PHOTOS);
+                for(String photoUrl : photos) {
+                    photosLayout.addView(createPhotoImage(photoUrl));
+                }
+            }
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                System.out.println("The read failed: " + firebaseError.getMessage());
+            }
+        });
+    }
+
+    private ImageView createPhotoImage(final String photoPath) {
+        ImageView photo = new ImageView(this);
+        photo.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        photo.setImageResource(R.drawable.background_splash);
+
+        return photo;
+    }
+
+
+}
