@@ -1,5 +1,7 @@
 package au.com.tfsltd.tfs;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
@@ -12,6 +14,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -59,8 +62,18 @@ public class DetailActivity extends AppCompatActivity {
 
     private ImageView createPhotoImage(final String photoPath) {
         ImageView photo = new ImageView(this);
-        photo.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        photo.setImageResource(R.drawable.background_splash);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(20, 10, 20, 10);
+        photo.setLayoutParams(lp);
+        photo.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        photo.setAdjustViewBounds(true);
+
+        File imgFile = new File(this.getApplicationContext().getFilesDir() + "/" + photoPath + ".jpg");
+
+        if(imgFile.exists()){
+            Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+            photo.setImageBitmap(myBitmap);
+        }
 
         return photo;
     }

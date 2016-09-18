@@ -4,7 +4,8 @@ package au.com.tfsltd.tfs;
  * Created by adrian on 17.9.2016.
  */
 public class Constants {
-    public final static String FIREBASE = "https://tfstool-2c843.firebaseio.com/";
+    public final static String STORAGE = "gs://tfstool-2c843.appspot.com";
+    public final static String PHOTOS_ZIP = "photos.zip";
 
     public final static String PATH = "path";
     public final static String PATH_SEPARATOR = "/";
