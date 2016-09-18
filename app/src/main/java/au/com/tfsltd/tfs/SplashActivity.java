@@ -2,21 +2,27 @@ package au.com.tfsltd.tfs;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 /**
  * Splash screen activity
  *
  * Created by adrian on 17.9.2016.
  */
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends StorageLoadingActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
-        finish();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        if (auth.getCurrentUser() != null) {
+            loadQuestionActivity(this);
+        } else {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+        }
     }
 }
