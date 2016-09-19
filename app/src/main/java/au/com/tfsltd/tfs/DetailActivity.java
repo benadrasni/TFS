@@ -25,12 +25,11 @@ import java.util.Map;
  */
 public class DetailActivity extends AppCompatActivity {
 
-    private String path;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        path = getIntent().getExtras().getString(Constants.PATH);
+        String path = getIntent().getExtras().getString(Constants.PATH);
+        assert path != null;
 
         setContentView(R.layout.activity_detail);
 

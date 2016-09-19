@@ -106,7 +106,7 @@ public class StorageLoadingActivity extends AppCompatActivity {
                 zis = new ZipInputStream(new BufferedInputStream(is));
                 ZipEntry ze;
                 byte[] buffer = new byte[1024];
-                int count = 0;
+                int count;
                 while ((ze = zis.getNextEntry()) != null) {
                     filename = ze.getName();
                     path = StorageLoadingActivity.this.getApplicationContext().getFilesDir() + "/";

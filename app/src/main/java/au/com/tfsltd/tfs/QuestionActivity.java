@@ -80,7 +80,6 @@ public class QuestionActivity extends AppCompatActivity {
                             + Constants.FIELD_ANSWER_PREFIX + i);
                     startActivity(intent);
                 }
-
             }
         });
 
