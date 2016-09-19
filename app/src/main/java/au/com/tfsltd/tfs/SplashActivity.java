@@ -18,7 +18,7 @@ public class SplashActivity extends StorageLoadingActivity {
 
         FirebaseAuth auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {
-            loadQuestionActivity(this);
+            loadQuestionActivity();
         } else {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);

@@ -70,7 +70,7 @@ public class LoginActivity extends StorageLoadingActivity {
                                 Toast.makeText(LoginActivity.this, getString(R.string.auth_failed), Toast.LENGTH_LONG).show();
                             }
                         } else {
-                            loadQuestionActivity(LoginActivity.this);
+                            loadQuestionActivity();
                         }
                     }
                 });

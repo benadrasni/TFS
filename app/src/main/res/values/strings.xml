@@ -19,4 +19,5 @@
     <string name="forgot_password_msg">We just need your registered Email Id to sent you password reset instructions.</string>
     <string name="desc_logo">Logo</string>
     <string name="downloading_photos">Downloading photos ...</string>
+    <string name="unzipping_photos">Unzipping photos ...</string>
 </resources>
