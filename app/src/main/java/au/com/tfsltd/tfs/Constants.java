@@ -10,6 +10,7 @@ public class Constants {
     public final static String PATH = "path";
     public final static String PATH_SEPARATOR = "/";
 
+    public final static String FIELD_SETTINGS = "settings";
     public final static String FIELD_QUESTION = "question";
     public final static String FIELD_TEXT = "text";
     public final static String FIELD_ANSWERS = "answers";

@@ -20,4 +20,6 @@
     <string name="desc_logo">Logo</string>
     <string name="downloading_photos">Downloading photos ...</string>
     <string name="unzipping_photos">Unzipping photos ...</string>
+
+    <string name="first_question">How many legs does it have, if any?</string>
 </resources>
