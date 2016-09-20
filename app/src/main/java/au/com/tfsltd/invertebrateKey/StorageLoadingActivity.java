@@ -1,4 +1,4 @@
-package au.com.tfsltd.tfs;
+package au.com.tfsltd.invertebrateKey;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -47,7 +47,7 @@ public class StorageLoadingActivity extends AppCompatActivity {
         private int _size;
         private int _processedFiles;
 
-        public UnpackZip(File zipFile) {
+        UnpackZip(File zipFile) {
             _zipFile = zipFile;
             _processedFiles = 0;
             _size = 0;
@@ -167,9 +167,9 @@ public class StorageLoadingActivity extends AppCompatActivity {
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
                         long time = dataSnapshot.getValue() == null ? 0 : (long) dataSnapshot.getValue();
+                        final File localFile = new File(getApplicationContext().getFilesDir() + "/" + Constants.PHOTOS_ZIP);
 
-                        if (time < storageMetadata.getUpdatedTimeMillis()) {
-                            final File localFile = new File(getApplicationContext().getFilesDir() + "/" + Constants.PHOTOS_ZIP);
+                        if (time < storageMetadata.getUpdatedTimeMillis() || !localFile.exists()) {
 
                             progressDialog = new ProgressDialog(StorageLoadingActivity.this);
                             progressDialog.setMessage(getResources().getString(R.string.downloading_photos));

@@ -1,4 +1,4 @@
-package au.com.tfsltd.tfs;
+package au.com.tfsltd.invertebrateKey;
 
 import org.junit.Test;
 
