@@ -25,6 +25,8 @@ import java.util.Map;
  */
 public class DetailActivity extends AppCompatActivity {
 
+    private Bitmap[] myBitmap;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,8 +49,11 @@ public class DetailActivity extends AppCompatActivity {
                 detailView.setText((String)detail.get(Constants.FIELD_DETAIL));
 
                 List<String> photos = (List<String>)detail.get(Constants.FIELD_PHOTOS);
+                myBitmap = new Bitmap[photos.size()];
+                int i = 0;
                 for(String photoUrl : photos) {
-                    photosLayout.addView(createPhotoImage(photoUrl));
+                    photosLayout.addView(createPhotoImage(photoUrl, i));
+                    i++;
                 }
             }
 
@@ -59,7 +64,17 @@ public class DetailActivity extends AppCompatActivity {
         });
     }
 
-    private ImageView createPhotoImage(final String photoPath) {
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        for (Bitmap bitmap : myBitmap) {
+            if (bitmap != null) {
+                bitmap.recycle();
+            }
+        }
+    }
+
+    private ImageView createPhotoImage(final String photoPath, int i) {
         ImageView photo = new ImageView(this);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         lp.setMargins(20, 10, 20, 10);
@@ -67,15 +82,13 @@ public class DetailActivity extends AppCompatActivity {
         photo.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         photo.setAdjustViewBounds(true);
 
-        File imgFile = new File(this.getApplicationContext().getFilesDir() + "/" + photoPath + ".jpg");
+        File imgFile = new File(this.getApplicationContext().getFilesDir() + Constants.PATH_SEPARATOR + photoPath + ".jpg");
 
-        if(imgFile.exists()){
-            Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-            photo.setImageBitmap(myBitmap);
+        if (imgFile.exists()) {
+            myBitmap[i] = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+            photo.setImageBitmap(myBitmap[i]);
         }
 
         return photo;
     }
-
-
 }

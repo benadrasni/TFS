@@ -1,7 +1,9 @@
 package au.com.tfsltd.invertebrateKey;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -150,74 +152,83 @@ public class StorageLoadingActivity extends AppCompatActivity {
         assert auth.getCurrentUser() != null;
         userUid = auth.getCurrentUser().getUid();
 
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageRef = storage.getReferenceFromUrl(Constants.STORAGE);
-        photosReference = storageRef.child(Constants.PHOTOS_ZIP);
-
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference mFirebaseRef = database.getReference(Constants.FIELD_SETTINGS + Constants.PATH_SEPARATOR + userUid
                 + Constants.PATH_SEPARATOR + Constants.FIELD_PHOTOS);
 
-        photosReference.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
-            @Override
-            public void onSuccess(final StorageMetadata storageMetadata) {
+        if (isNetworkAvailable(StorageLoadingActivity.this.getApplicationContext())) {
 
-                mFirebaseRef.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageRef = storage.getReferenceFromUrl(Constants.STORAGE);
+            photosReference = storageRef.child(Constants.PHOTOS_ZIP);
+            photosReference.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                @Override
+                public void onSuccess(final StorageMetadata storageMetadata) {
 
-                        long time = dataSnapshot.getValue() == null ? 0 : (long) dataSnapshot.getValue();
-                        final File localFile = new File(getApplicationContext().getFilesDir() + "/" + Constants.PHOTOS_ZIP);
+                    mFirebaseRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        if (time < storageMetadata.getUpdatedTimeMillis() || !localFile.exists()) {
+                            long time = dataSnapshot.getValue() == null ? 0 : (long) dataSnapshot.getValue();
+                            final File localFile = new File(getApplicationContext().getFilesDir() + "/" + Constants.PHOTOS_ZIP);
 
-                            progressDialog = new ProgressDialog(StorageLoadingActivity.this);
-                            progressDialog.setMessage(getResources().getString(R.string.downloading_photos));
-                            progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                            progressDialog.setProgress(0);
-                            progressDialog.setMax(1);
-                            progressDialog.show();
+                            if (time < storageMetadata.getUpdatedTimeMillis() || !localFile.exists()) {
 
-                            photosReference.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                    new UnpackZip(localFile).execute();
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception exception) {
+                                progressDialog = new ProgressDialog(StorageLoadingActivity.this);
+                                progressDialog.setMessage(getResources().getString(R.string.downloading_photos));
+                                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                                progressDialog.setProgress(0);
+                                progressDialog.setMax(1);
+                                progressDialog.show();
 
-                                }
-                            }).addOnProgressListener(new OnProgressListener<FileDownloadTask.TaskSnapshot>() {
-                                @Override
-                                public void onProgress(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                    int progress = (int) (100.0 * ((float) taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount()));
-                                    progressDialog.setProgress(progress);
-                                }
-                            });
-                        } else {
-                            callQuestionActivity();
+                                photosReference.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                                    @Override
+                                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                        new UnpackZip(localFile).execute();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception exception) {
+
+                                    }
+                                }).addOnProgressListener(new OnProgressListener<FileDownloadTask.TaskSnapshot>() {
+                                    @Override
+                                    public void onProgress(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                        int progress = (int) (100.0 * ((float) taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount()));
+                                        progressDialog.setProgress(progress);
+                                    }
+                                });
+                            } else {
+                                callQuestionActivity();
+                            }
+                            mFirebaseRef.removeEventListener(this);
                         }
-                        mFirebaseRef.removeEventListener(this);
-                    }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        System.out.println("The read failed: " + databaseError.getMessage());
-                    }
-                });
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-            }
-        });
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            System.out.println("The read failed: " + databaseError.getMessage());
+                        }
+                    });
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                }
+            });
+        } else {
+            callQuestionActivity();
+        }
     }
 
     private void callQuestionActivity() {
         Intent intent = new Intent(StorageLoadingActivity.this, QuestionActivity.class);
-        intent.putExtra(Constants.PATH, Constants.FIELD_QUESTION);
+        intent.putExtra(Constants.PATH, Constants.FIELD_QUESTIONAIRE + Constants.PATH_SEPARATOR + Constants.FIELD_QUESTION);
         startActivity(intent);
         finish();
+    }
+
+    public boolean isNetworkAvailable(final Context context) {
+        final ConnectivityManager connectivityManager = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
+        return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
     }
 }
