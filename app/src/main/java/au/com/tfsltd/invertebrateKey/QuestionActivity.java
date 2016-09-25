@@ -53,7 +53,11 @@ public class QuestionActivity extends AppCompatActivity {
                 Map question = (Map)dataSnapshot.getValue();
 
                 questionView.setText((String)question.get(Constants.FIELD_TEXT));
-                noteView.setText((String)question.get(Constants.FIELD_NOTE));
+                String note = (String)question.get(Constants.FIELD_NOTE);
+                if (note != null && !note.isEmpty()) {
+                    noteView.setText(note);
+                    noteView.setVisibility(View.VISIBLE);
+                }
 
                 LinearLayout answerRowLayout = null;
                 Map answers = (Map)question.get(Constants.FIELD_ANSWERS);
