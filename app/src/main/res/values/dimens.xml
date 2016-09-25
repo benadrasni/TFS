@@ -9,6 +9,7 @@
 
     <dimen name="question_margin">16dp</dimen>
     <dimen name="question_text_size">25sp</dimen>
+    <dimen name="note_text_size">20sp</dimen>
 
     <dimen name="answer_margin">5dp</dimen>
 

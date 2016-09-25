@@ -17,6 +17,7 @@ public class Constants {
     public final static String FIELD_QUESTIONAIRE = "questionaire";
     public final static String FIELD_QUESTION = "question";
     public final static String FIELD_TEXT = "text";
+    public final static String FIELD_NOTE = "note";
     public final static String FIELD_PHOTO = "photo";
     public final static String FIELD_ANSWERS = "answers";
     public final static String FIELD_ANSWER_PREFIX = "ans";

@@ -30,7 +30,8 @@ import java.util.Map;
 public class QuestionActivity extends AppCompatActivity {
 
     private String path;
-    //private Bitmap[] myBitmap;
+    private int[] lineCounts;
+    private TextView[] textViews;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +41,8 @@ public class QuestionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_question);
 
         final TextView questionView = (TextView) findViewById(R.id.question);
+        final TextView noteView = (TextView) findViewById(R.id.note);
         final LinearLayout answersView = (LinearLayout) findViewById(R.id.answers);
-        final GridLayout answersGridView = (GridLayout) findViewById(R.id.answers_grid);
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference mFirebaseRef = database.getReference(path);
@@ -52,16 +53,34 @@ public class QuestionActivity extends AppCompatActivity {
                 Map question = (Map)dataSnapshot.getValue();
 
                 questionView.setText((String)question.get(Constants.FIELD_TEXT));
+                noteView.setText((String)question.get(Constants.FIELD_NOTE));
 
+                LinearLayout answerRowLayout = null;
                 Map answers = (Map)question.get(Constants.FIELD_ANSWERS);
-                //myBitmap = new Bitmap[answers.size()];
+                lineCounts = new int[answers.size()];
+                textViews = new TextView[answers.size()];
                 for(int i = 1; i <= answers.size(); i++) {
                     final Map answer = (Map) answers.get(Constants.FIELD_ANSWER_PREFIX + i);
 
-                    if (i == answers.size() && answers.size() % 2 == 1) {
-                        answersView.addView(createAnswerLayout(answer, i, false));
+                    if (i % 2 == 1) {
+                        if (i == answers.size()) {
+                            answersView.addView(createAnswerLayout(answer, i, false));
+                        } else {
+                            answerRowLayout = (LinearLayout) LayoutInflater.from(getApplicationContext()).inflate(R.layout.answer_row, null);
+                            answersView.addView(answerRowLayout);
+                            answerRowLayout.addView(createAnswerLayout(answer, i, true));
+                        }
                     } else {
-                        answersGridView.addView(createAnswerLayout(answer, i, true));
+                        answerRowLayout.addView(createAnswerLayout(answer, i, true));
+                        final int j = i-1;
+                        answerRowLayout.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                int lineCount = Math.max(lineCounts[j], lineCounts[j-1]);
+                                textViews[j].setLines(lineCount);
+                                textViews[j-1].setLines(lineCount);
+                            }
+                        });
                     }
                 }
             }
@@ -73,20 +92,19 @@ public class QuestionActivity extends AppCompatActivity {
         });
     }
 
-//    @Override
-//    protected void onDestroy() {
-//        super.onDestroy();
-//        for (Bitmap bitmap : myBitmap) {
-//            if (bitmap != null) {
-//                bitmap.recycle();
-//            }
-//        }
-//    }
-
     private LinearLayout createAnswerLayout(final Map answer, final int i, boolean isInGrid) {
-        final LinearLayout answerLayout = (LinearLayout) LayoutInflater.from(this.getApplicationContext()).inflate(R.layout.button_answer, null);
-        TextView textView = (TextView) answerLayout.findViewById(R.id.answer_text);
+        final LinearLayout answerLayout = (LinearLayout) LayoutInflater.from(this.getApplicationContext()).inflate(R.layout.answer, null);
+        final TextView textView = (TextView) answerLayout.findViewById(R.id.answer_text);
+        textViews[i-1] = textView;
         textView.setText((String)answer.get(Constants.FIELD_TEXT));
+        textView.post(new Runnable() {
+            @Override
+            public void run() {
+                int lineCount = textView.getLineCount();
+                lineCounts[i-1] = lineCount;
+//                textView.setLines(lineCount);
+            }
+        });
 
         ImageView photoView = (ImageView) answerLayout.findViewById(R.id.answer_photo);
         DisplayMetrics dm = this.getResources().getDisplayMetrics();
@@ -114,13 +132,6 @@ public class QuestionActivity extends AppCompatActivity {
         } else {
             photoView.setImageBitmap(myBitmap);
         }
-
-//        File imgFile = new File(this.getApplicationContext().getFilesDir() + imageKey);
-//
-//        if (imgFile.exists()) {
-//            myBitmap[i-1] = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-//            photoView.setImageBitmap(myBitmap[i-1]);
-//        }
 
         answerLayout.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
