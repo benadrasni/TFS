@@ -75,6 +75,7 @@ public class QuestionActivity extends AppCompatActivity {
                             answerRowLayout.addView(createAnswerLayout(answer, i, true));
                         }
                     } else {
+                        assert answerRowLayout != null;
                         answerRowLayout.addView(createAnswerLayout(answer, i, true));
                         final int j = i-1;
                         answerRowLayout.post(new Runnable() {
