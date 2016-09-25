@@ -50,6 +50,7 @@ public class QuestionActivity extends AppCompatActivity {
         mFirebaseRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                answersView.removeAllViews();
                 Map question = (Map)dataSnapshot.getValue();
 
                 questionView.setText((String)question.get(Constants.FIELD_TEXT));
@@ -57,6 +58,8 @@ public class QuestionActivity extends AppCompatActivity {
                 if (note != null && !note.isEmpty()) {
                     noteView.setText(note);
                     noteView.setVisibility(View.VISIBLE);
+                } else {
+                    noteView.setVisibility(View.GONE);
                 }
 
                 LinearLayout answerRowLayout = null;
