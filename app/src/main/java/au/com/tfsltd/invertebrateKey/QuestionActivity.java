@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayout;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +31,9 @@ public class QuestionActivity extends AppCompatActivity {
     private String path;
     private int[] lineCounts;
     private TextView[] textViews;
+    private Map answers;
+
+    private int count;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +65,7 @@ public class QuestionActivity extends AppCompatActivity {
                 }
 
                 LinearLayout answerRowLayout = null;
-                Map answers = (Map)question.get(Constants.FIELD_ANSWERS);
+                answers = (Map)question.get(Constants.FIELD_ANSWERS);
                 lineCounts = new int[answers.size()];
                 textViews = new TextView[answers.size()];
                 for(int i = 1; i <= answers.size(); i++) {
@@ -80,15 +82,6 @@ public class QuestionActivity extends AppCompatActivity {
                     } else {
                         assert answerRowLayout != null;
                         answerRowLayout.addView(createAnswerLayout(answer, i, true));
-                        final int j = i-1;
-                        answerRowLayout.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                int lineCount = Math.max(lineCounts[j], lineCounts[j-1]);
-                                textViews[j].setLines(lineCount);
-                                textViews[j-1].setLines(lineCount);
-                            }
-                        });
                     }
                 }
             }
@@ -108,9 +101,16 @@ public class QuestionActivity extends AppCompatActivity {
         textView.post(new Runnable() {
             @Override
             public void run() {
-                int lineCount = textView.getLineCount();
-                lineCounts[i-1] = lineCount;
-//                textView.setLines(lineCount);
+                lineCounts[i-1] = textView.getLineCount();
+                count++;
+                if (count == answers.size()-1) {
+                    for(int i = 1; i < answers.size(); i += 2) {
+
+                        int lineCount = Math.max(lineCounts[i], lineCounts[i-1]);
+                        textViews[i].setLines(lineCount);
+                        textViews[i-1].setLines(lineCount);
+                    }
+                }
             }
         });
 

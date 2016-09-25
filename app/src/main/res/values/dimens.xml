@@ -14,4 +14,6 @@
     <dimen name="answer_margin">5dp</dimen>
 
     <dimen name="detail_margin">16dp</dimen>
+
+    <dimen name="fab_margin">16dp</dimen>
 </resources>
