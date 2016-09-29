@@ -41,14 +41,13 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Detail activity
- *
+ * <p>
  * Created by adrian on 17.9.2016.
  */
 public class DetailActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -56,6 +55,7 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
     static final int REQUEST_TAKE_PHOTO = 1;
 
     private GoogleApiClient mGoogleApiClient;
+    private FirebaseDatabase database;
 
     FloatingActionButton fab;
     FloatingActionButton fabPhoto;
@@ -68,10 +68,13 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
     Animation hideFabShare;
 
     private boolean FAB_Status = false;
+
     private Location mLastLocation;
     private Uri mCurrentPhotoUri;
-    private String mCurrentPhotoPath;
+    private Date date;
+    private String path;
     private String possibleAnswers;
+    private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,7 +122,7 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
             }
         });
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        database = FirebaseDatabase.getInstance();
         DatabaseReference mFirebaseRef = database.getReference(path);
 
         mFirebaseRef.addValueEventListener(new ValueEventListener() {
@@ -149,14 +152,30 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
                     .addApi(LocationServices.API)
                     .build();
         }
+
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        assert auth.getCurrentUser() != null;
+        userId = auth.getCurrentUser().getUid();
     }
+
+    @Override
+    protected void onStart() {
+        mGoogleApiClient.connect();
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
 
             final Observation observation = new Observation();
-            observation.setDate(new Date());
             if (mLastLocation != null) {
                 observation.setLatitude(mLastLocation.getLatitude());
                 observation.setLongitude(mLastLocation.getLongitude());
@@ -167,25 +186,24 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
                 FirebaseStorage storage = FirebaseStorage.getInstance();
                 StorageReference storageRef = storage.getReferenceFromUrl(Constants.STORAGE);
 
-                StorageReference imagesRef = storageRef.child(Constants.PHOTOS_STORAGE + Constants.PATH_SEPARATOR
-                        + mCurrentPhotoUri.getLastPathSegment());
+                StorageReference imagesRef = storageRef.child(Constants.PHOTOS_STORAGE + path + mCurrentPhotoUri.getLastPathSegment());
                 UploadTask uploadTask = imagesRef.putFile(mCurrentPhotoUri);
                 uploadTask.addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
-                        observation.setPhotoPath(mCurrentPhotoPath);
+                        observation.setPhotoPath(path + mCurrentPhotoUri.getLastPathSegment());
                         saveObservation(observation);
                     }
                 }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        observation.setPhotoPath(taskSnapshot.getDownloadUrl().getPath());
+                        observation.setPhotoPath(path + mCurrentPhotoUri.getLastPathSegment());
                         saveObservation(observation);
                     }
                 });
 
             } else {
-                observation.setPhotoPath(mCurrentPhotoPath);
+                observation.setPhotoPath(path + mCurrentPhotoUri.getLastPathSegment());
                 saveObservation(observation);
             }
         }
@@ -196,10 +214,10 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
     public void onConnected(@Nullable Bundle bundle) {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
             return;
         }
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
     }
 
     @Override
@@ -272,18 +290,13 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
     }
 
     private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
+        date = new Date();
+        path = Constants.PATH_SEPARATOR + userId + Constants.PATH_SEPARATOR + date.getTime() + Constants.PATH_SEPARATOR;
 
-        return image;
+        String imageFileName = "JPEG_" + date.getTime() + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES + path);
+
+        return File.createTempFile(imageFileName, ".jpg", storageDir);
     }
 
     private void dispatchTakePictureIntent() {
@@ -299,9 +312,7 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
             }
             // Continue only if the File was successfully created
             if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this,
-                        "au.com.tfsltd.invertebrateKey.fileprovider",
-                        photoFile);
+                Uri photoURI = FileProvider.getUriForFile(this, "au.com.tfsltd.invertebrateKey.fileprovider", photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 mCurrentPhotoUri = photoURI;
                 startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
@@ -310,7 +321,6 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
     }
 
     private void saveObservation(Observation observation) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference mFirebaseRef = database.getReference();
 
         FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -319,7 +329,7 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
 
         long time = new Date().getTime();
 
-        mFirebaseRef.child(Constants.FIELD_OBSERVATIONS).child(userUid).child(possibleAnswers).child(""+time).setValue(observation);
+        mFirebaseRef.child(Constants.FIELD_OBSERVATIONS).child(userUid).child(possibleAnswers).child("" + time).setValue(observation);
     }
 
 }

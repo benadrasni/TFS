@@ -6,6 +6,8 @@ package au.com.tfsltd.invertebrateKey;
  * Created by adrian on 17.9.2016.
  */
 public class Constants {
+    public final static int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 0;
+
     public final static String STORAGE = "gs://tfstool-2c843.appspot.com";
     public final static String PHOTOS_STORAGE = "/images";
     public final static String PHOTOS_ZIP = "photos.zip";

@@ -1,13 +1,5 @@
 package au.com.tfsltd.invertebrateKey;
 
-import android.net.Uri;
-
-import com.google.firebase.database.Exclude;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Entity which represents single observation
  *
@@ -18,7 +10,6 @@ public class Observation {
 
     private double longitude;
     private double latitude;
-    private Date date;
     private String photoPath;
 
     public double getLongitude() {
@@ -35,14 +26,6 @@ public class Observation {
 
     public void setLatitude(double latitude) {
         this.latitude = latitude;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
     }
 
     public String getPhotoPath() {
