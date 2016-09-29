@@ -1,7 +1,9 @@
 package au.com.tfsltd.invertebrateKey;
 
 import android.app.Application;
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
 import android.support.v4.util.LruCache;
 
 import com.google.firebase.database.FirebaseDatabase;
@@ -48,5 +50,10 @@ public class TFSApp extends Application {
 
     public Bitmap getBitmapFromMemCache(String key) {
         return mMemoryCache.get(key);
+    }
+
+    public boolean isNetworkAvailable(final Context context) {
+        final ConnectivityManager connectivityManager = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
+        return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
     }
 }

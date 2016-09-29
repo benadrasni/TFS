@@ -1,27 +1,48 @@
 package au.com.tfsltd.invertebrateKey;
 
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -30,22 +51,27 @@ import java.util.Map;
  *
  * Created by adrian on 17.9.2016.
  */
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
+    static final int REQUEST_TAKE_PHOTO = 1;
+
+    private GoogleApiClient mGoogleApiClient;
 
     FloatingActionButton fab;
-    FloatingActionButton fab1;
-    FloatingActionButton fab2;
-    FloatingActionButton fab3;
+    FloatingActionButton fabPhoto;
+    FloatingActionButton fabShare;
 
     //Animations
-    Animation show_fab_1;
-    Animation hide_fab_1;
-    Animation show_fab_2;
-    Animation hide_fab_2;
-    Animation show_fab_3;
-    Animation hide_fab_3;
+    Animation showFabPhoto;
+    Animation hideFabPhoto;
+    Animation showFabShare;
+    Animation hideFabShare;
 
     private boolean FAB_Status = false;
+    private Location mLastLocation;
+    private Uri mCurrentPhotoUri;
+    private String mCurrentPhotoPath;
+    private String possibleAnswers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,16 +84,13 @@ public class DetailActivity extends AppCompatActivity {
         final TextView detailView = (TextView) findViewById(R.id.detail);
         final LinearLayout photosLayout = (LinearLayout) findViewById(R.id.photos);
         fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab1 = (FloatingActionButton) findViewById(R.id.fab_1);
-        fab2 = (FloatingActionButton) findViewById(R.id.fab_2);
-        fab3 = (FloatingActionButton) findViewById(R.id.fab_3);
+        fabPhoto = (FloatingActionButton) findViewById(R.id.fab_photo);
+        fabShare = (FloatingActionButton) findViewById(R.id.fab_share);
 
-        show_fab_1 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab1_show);
-        hide_fab_1 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab1_hide);
-        show_fab_2 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab2_show);
-        hide_fab_2 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab2_hide);
-        show_fab_3 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab3_show);
-        hide_fab_3 = AnimationUtils.loadAnimation(getApplication(), R.anim.fab3_hide);
+        showFabPhoto = AnimationUtils.loadAnimation(getApplication(), R.anim.fab_photo_show);
+        hideFabPhoto = AnimationUtils.loadAnimation(getApplication(), R.anim.fab_photo_hide);
+        showFabShare = AnimationUtils.loadAnimation(getApplication(), R.anim.fab_share_show);
+        hideFabShare = AnimationUtils.loadAnimation(getApplication(), R.anim.fab_share_hide);
 
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -82,21 +105,14 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
 
-        fab1.setOnClickListener(new View.OnClickListener() {
+        fabPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplication(), "Floating Action Button 1", Toast.LENGTH_SHORT).show();
+                dispatchTakePictureIntent();
             }
         });
 
-        fab2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getApplication(), "Floating Action Button 2", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        fab3.setOnClickListener(new View.OnClickListener() {
+        fabShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplication(), "Floating Action Button 3", Toast.LENGTH_SHORT).show();
@@ -109,12 +125,13 @@ public class DetailActivity extends AppCompatActivity {
         mFirebaseRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Map detail = (Map)dataSnapshot.getValue();
+                Map detailMap = (Map) dataSnapshot.getValue();
 
-                detailView.setText((String)detail.get(Constants.FIELD_DETAIL));
+                detailView.setText((String) detailMap.get(Constants.FIELD_ENDPOINT_INFO));
+                possibleAnswers = (String) detailMap.get(Constants.FIELD_POSSIBLE_ANSWERS);
 
-                List<String> photos = (List<String>)detail.get(Constants.FIELD_PHOTOS);
-                for(String photoUrl : photos) {
+                List<String> photos = (List<String>) detailMap.get(Constants.FIELD_PHOTOS);
+                for (String photoUrl : photos) {
                     photosLayout.addView(createPhotoImage(photoUrl));
                 }
             }
@@ -124,6 +141,75 @@ public class DetailActivity extends AppCompatActivity {
                 System.out.println("The read failed: " + databaseError.getMessage());
             }
         });
+
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+
+            final Observation observation = new Observation();
+            observation.setDate(new Date());
+            if (mLastLocation != null) {
+                observation.setLatitude(mLastLocation.getLatitude());
+                observation.setLongitude(mLastLocation.getLongitude());
+            }
+
+            TFSApp tfsApp = (TFSApp) getApplication();
+            if (tfsApp.isNetworkAvailable(getApplicationContext())) {
+                FirebaseStorage storage = FirebaseStorage.getInstance();
+                StorageReference storageRef = storage.getReferenceFromUrl(Constants.STORAGE);
+
+                StorageReference imagesRef = storageRef.child(Constants.PHOTOS_STORAGE + Constants.PATH_SEPARATOR
+                        + mCurrentPhotoUri.getLastPathSegment());
+                UploadTask uploadTask = imagesRef.putFile(mCurrentPhotoUri);
+                uploadTask.addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        observation.setPhotoPath(mCurrentPhotoPath);
+                        saveObservation(observation);
+                    }
+                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        observation.setPhotoPath(taskSnapshot.getDownloadUrl().getPath());
+                        saveObservation(observation);
+                    }
+                });
+
+            } else {
+                observation.setPhotoPath(mCurrentPhotoPath);
+                saveObservation(observation);
+            }
+        }
+    }
+
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
     }
 
     private ImageView createPhotoImage(final String photoPath) {
@@ -135,7 +221,7 @@ public class DetailActivity extends AppCompatActivity {
         photo.setAdjustViewBounds(true);
 
         String imageKey = Constants.PATH_SEPARATOR + photoPath + ".jpg";
-        Bitmap myBitmap = ((TFSApp)getApplication()).getBitmapFromMemCache(imageKey);
+        Bitmap myBitmap = ((TFSApp) getApplication()).getBitmapFromMemCache(imageKey);
         if (myBitmap == null) {
             File imgFile = new File(this.getApplicationContext().getFilesDir() + imageKey);
             if (imgFile.exists()) {
@@ -152,62 +238,88 @@ public class DetailActivity extends AppCompatActivity {
 
     private void expandFAB() {
 
-        //Floating Action Button 1
-        CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) fab1.getLayoutParams();
-        layoutParams.rightMargin += (int) (fab1.getWidth() * 1.7);
-        layoutParams.bottomMargin += (int) (fab1.getHeight() * 0.25);
-        fab1.setVisibility(View.VISIBLE);
-        fab1.setLayoutParams(layoutParams);
-        fab1.startAnimation(show_fab_1);
-        fab1.setClickable(true);
+        CoordinatorLayout.LayoutParams layoutParamsPhoto = (CoordinatorLayout.LayoutParams) fabPhoto.getLayoutParams();
+        layoutParamsPhoto.bottomMargin += (int) (fabPhoto.getHeight() * 1.5);
+        fabPhoto.setVisibility(View.VISIBLE);
+        fabPhoto.setLayoutParams(layoutParamsPhoto);
+        fabPhoto.startAnimation(showFabPhoto);
+        fabPhoto.setClickable(true);
 
-        //Floating Action Button 2
-        CoordinatorLayout.LayoutParams layoutParams2 = (CoordinatorLayout.LayoutParams) fab2.getLayoutParams();
-        layoutParams2.rightMargin += (int) (fab2.getWidth() * 1.5);
-        layoutParams2.bottomMargin += (int) (fab2.getHeight() * 1.5);
-        fab2.setVisibility(View.VISIBLE);
-        fab2.setLayoutParams(layoutParams2);
-        fab2.startAnimation(show_fab_2);
-        fab2.setClickable(true);
-
-        //Floating Action Button 3
-        CoordinatorLayout.LayoutParams layoutParams3 = (CoordinatorLayout.LayoutParams) fab3.getLayoutParams();
-        layoutParams3.rightMargin += (int) (fab3.getWidth() * 0.25);
-        layoutParams3.bottomMargin += (int) (fab3.getHeight() * 1.7);
-        fab3.setVisibility(View.VISIBLE);
-        fab3.setLayoutParams(layoutParams3);
-        fab3.startAnimation(show_fab_3);
-        fab3.setClickable(true);
+        CoordinatorLayout.LayoutParams layoutParamsShare = (CoordinatorLayout.LayoutParams) fabShare.getLayoutParams();
+        layoutParamsShare.bottomMargin += (int) (fabShare.getHeight() * 3.0);
+        fabShare.setVisibility(View.VISIBLE);
+        fabShare.setLayoutParams(layoutParamsShare);
+        fabShare.startAnimation(showFabShare);
+        fabShare.setClickable(true);
     }
 
 
     private void hideFAB() {
 
-        //Floating Action Button 1
-        CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) fab1.getLayoutParams();
-        layoutParams.rightMargin -= (int) (fab1.getWidth() * 1.7);
-        layoutParams.bottomMargin -= (int) (fab1.getHeight() * 0.25);
-        fab1.setLayoutParams(layoutParams);
-        fab1.startAnimation(hide_fab_1);
-        fab1.setClickable(false);
-        fab1.setVisibility(View.INVISIBLE);
+        CoordinatorLayout.LayoutParams layoutParamsPhoto = (CoordinatorLayout.LayoutParams) fabPhoto.getLayoutParams();
+        layoutParamsPhoto.bottomMargin -= (int) (fabPhoto.getHeight() * 1.5);
+        fabPhoto.setLayoutParams(layoutParamsPhoto);
+        fabPhoto.startAnimation(hideFabPhoto);
+        fabPhoto.setClickable(false);
+        fabPhoto.setVisibility(View.INVISIBLE);
 
-        //Floating Action Button 2
-        CoordinatorLayout.LayoutParams layoutParams2 = (CoordinatorLayout.LayoutParams) fab2.getLayoutParams();
-        layoutParams2.rightMargin -= (int) (fab2.getWidth() * 1.5);
-        layoutParams2.bottomMargin -= (int) (fab2.getHeight() * 1.5);
-        fab2.setLayoutParams(layoutParams2);
-        fab2.startAnimation(hide_fab_2);
-        fab2.setClickable(false);
-        fab2.setVisibility(View.INVISIBLE);
-
-        //Floating Action Button 3
-        CoordinatorLayout.LayoutParams layoutParams3 = (CoordinatorLayout.LayoutParams) fab3.getLayoutParams();
-        layoutParams3.rightMargin -= (int) (fab3.getWidth() * 0.25);
-        layoutParams3.bottomMargin -= (int) (fab3.getHeight() * 1.7);
-        fab3.setLayoutParams(layoutParams3);
-        fab3.startAnimation(hide_fab_3);
-        fab3.setClickable(false);
-        fab3.setVisibility(View.INVISIBLE);
+        CoordinatorLayout.LayoutParams layoutParamsShare = (CoordinatorLayout.LayoutParams) fabShare.getLayoutParams();
+        layoutParamsShare.bottomMargin -= (int) (fabShare.getHeight() * 3.0);
+        fabShare.setLayoutParams(layoutParamsShare);
+        fabShare.startAnimation(hideFabShare);
+        fabShare.setClickable(false);
+        fabShare.setVisibility(View.INVISIBLE);
     }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
+
+        return image;
+    }
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "au.com.tfsltd.invertebrateKey.fileprovider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                mCurrentPhotoUri = photoURI;
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            }
+        }
+    }
+
+    private void saveObservation(Observation observation) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference mFirebaseRef = database.getReference();
+
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        assert auth.getCurrentUser() != null;
+        String userUid = auth.getCurrentUser().getUid();
+
+        long time = new Date().getTime();
+
+        mFirebaseRef.child(Constants.FIELD_OBSERVATIONS).child(userUid).child(possibleAnswers).child(""+time).setValue(observation);
+    }
+
 }

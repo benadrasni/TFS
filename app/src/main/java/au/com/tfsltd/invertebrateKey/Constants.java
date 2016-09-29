@@ -7,6 +7,7 @@ package au.com.tfsltd.invertebrateKey;
  */
 public class Constants {
     public final static String STORAGE = "gs://tfstool-2c843.appspot.com";
+    public final static String PHOTOS_STORAGE = "/images";
     public final static String PHOTOS_ZIP = "photos.zip";
 
     public final static String PATH = "path";
@@ -21,6 +22,10 @@ public class Constants {
     public final static String FIELD_PHOTO = "photo";
     public final static String FIELD_ANSWERS = "answers";
     public final static String FIELD_ANSWER_PREFIX = "ans";
-    public final static String FIELD_DETAIL = "endpoint info";
+    public final static String FIELD_ENDPOINT_INFO = "endpoint info";
+    public final static String FIELD_POSSIBLE_ANSWERS = "possible answers";
     public final static String FIELD_PHOTOS = "photos";
+
+    public final static String FIELD_OBSERVATIONS = "observations";
+
 }

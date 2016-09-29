@@ -156,7 +156,8 @@ public class StorageLoadingActivity extends AppCompatActivity {
         final DatabaseReference mFirebaseRef = database.getReference(Constants.FIELD_SETTINGS + Constants.PATH_SEPARATOR + userUid
                 + Constants.PATH_SEPARATOR + Constants.FIELD_PHOTOS);
 
-        if (isNetworkAvailable(StorageLoadingActivity.this.getApplicationContext())) {
+        TFSApp tfsApp = (TFSApp)getApplication();
+        if (tfsApp.isNetworkAvailable(StorageLoadingActivity.this.getApplicationContext())) {
 
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageRef = storage.getReferenceFromUrl(Constants.STORAGE);
@@ -165,7 +166,7 @@ public class StorageLoadingActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(final StorageMetadata storageMetadata) {
 
-                    mFirebaseRef.addValueEventListener(new ValueEventListener() {
+                    mFirebaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -201,7 +202,6 @@ public class StorageLoadingActivity extends AppCompatActivity {
                             } else {
                                 callQuestionActivity();
                             }
-                            mFirebaseRef.removeEventListener(this);
                         }
 
                         @Override
@@ -225,10 +225,5 @@ public class StorageLoadingActivity extends AppCompatActivity {
         intent.putExtra(Constants.PATH, Constants.FIELD_QUESTIONAIRE + Constants.PATH_SEPARATOR + Constants.FIELD_QUESTION);
         startActivity(intent);
         finish();
-    }
-
-    public boolean isNetworkAvailable(final Context context) {
-        final ConnectivityManager connectivityManager = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
-        return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
     }
 }
