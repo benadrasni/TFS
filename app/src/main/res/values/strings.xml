@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TFS Invertebrate Key</string>
+    <string name="app_name">Invertebrate Key</string>
 
     <string name="email">Email</string>
     <string name="minimum_password">Password too short, enter minimum 6 characters!</string>
@@ -22,4 +22,10 @@
     <string name="unzipping_photos">Unzipping photos ...</string>
 
     <string name="first_question">How many legs does it have, if any?</string>
+
+    <string name="map">Location</string>
+
+    <string name="email_subject">Invertebrate observation</string>
+    <string name="email_sending">Send email ...</string>
+
 </resources>

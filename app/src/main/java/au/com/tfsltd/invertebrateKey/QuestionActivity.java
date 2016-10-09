@@ -117,13 +117,11 @@ public class QuestionActivity extends AppCompatActivity {
         ImageView photoView = (ImageView) answerLayout.findViewById(R.id.answer_photo);
         DisplayMetrics dm = this.getResources().getDisplayMetrics();
         if (isInGrid) {
-            int size = (int) ((dm.widthPixels - 2 * this.getResources().getDimension(R.dimen.card_view_margin)
-                    - 4 * this.getResources().getDimension(R.dimen.answer_margin)) / 2);
+            int size = (int) ((dm.widthPixels - 2 * this.getResources().getDimension(R.dimen.card_view_margin) - 4 * this.getResources().getDimension(R.dimen.answer_margin)) / 2);
             photoView.getLayoutParams().width = size;
             photoView.getLayoutParams().height = size;
         } else {
-            int size = (int) (dm.widthPixels - 2 * this.getResources().getDimension(R.dimen.card_view_margin)
-                    - 2 * this.getResources().getDimension(R.dimen.answer_margin));
+            int size = (int) (dm.widthPixels - 2 * this.getResources().getDimension(R.dimen.card_view_margin) - 2 * this.getResources().getDimension(R.dimen.answer_margin));
             photoView.getLayoutParams().width = size;
             photoView.getLayoutParams().height = size / 4;
         }

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@drawable/border_bottom">
+
+    <CheckBox android:id="@+id/observation_check"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_gravity="center"/>
+
+    <LinearLayout android:orientation="vertical"
+                  android:layout_width="0dp"
+                  android:layout_height="match_parent"
+                  android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/observation_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/answer_margin"
+            android:layout_marginRight="@dimen/answer_margin"
+            android:layout_marginLeft="@dimen/answer_margin"
+            android:gravity="start"
+            android:textColor="@color/colorPrimaryDark"/>
+
+        <Button
+            android:id="@+id/observation_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/answer_margin"
+            android:layout_marginRight="@dimen/answer_margin"
+            android:layout_marginLeft="@dimen/answer_margin"
+            android:text="@string/map"
+            android:textAlignment="center"
+            android:clickable="true"
+            android:textColor="@color/colorPrimaryDark"/>
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/observation_photo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/answer_margin"
+        android:layout_marginRight="@dimen/answer_margin"
+        android:layout_marginLeft="@dimen/answer_margin"
+        android:scaleType="centerCrop"/>
+
+</LinearLayout>

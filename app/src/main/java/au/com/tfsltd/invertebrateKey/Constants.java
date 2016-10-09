@@ -7,17 +7,21 @@ package au.com.tfsltd.invertebrateKey;
  */
 public class Constants {
     public final static int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 0;
+    public final static int THUMBNAIL_SIZE = 128;
 
-    public final static String STORAGE = "gs://tfstool-2c843.appspot.com";
+    public final static String GOOGLE_MAPS = "http://www.google.com/maps/place/";
+    public final static String ZOOM = "17z";
+    public final static String STORAGE = "gs://invertebrate-key.appspot.com";
     public final static String PHOTOS_STORAGE = "/images";
     public final static String PHOTOS_ZIP = "photos.zip";
 
     public final static String PATH = "path";
+    public final static String MAP_LINK = "map_link";
     public final static String PATH_SEPARATOR = "/";
     public final static String ANSWER_DIR = "answers";
 
     public final static String FIELD_SETTINGS = "settings";
-    public final static String FIELD_QUESTIONAIRE = "questionaire";
+    public final static String FIELD_QUESTIONAIRE = "questionnaire";
     public final static String FIELD_QUESTION = "question";
     public final static String FIELD_TEXT = "text";
     public final static String FIELD_NOTE = "note";
@@ -30,4 +34,5 @@ public class Constants {
 
     public final static String FIELD_OBSERVATIONS = "observations";
 
+    public final static String EMAIL = "benadrasni@gmail.com";
 }

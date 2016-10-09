@@ -24,10 +24,12 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name="au.com.tfsltd.invertebrateKey.LoginActivity"/>
-        <activity android:name="au.com.tfsltd.invertebrateKey.ResetPasswordActivity"/>
-        <activity android:name="au.com.tfsltd.invertebrateKey.QuestionActivity"/>
-        <activity android:name="au.com.tfsltd.invertebrateKey.DetailActivity"/>
+        <activity android:name=".ResetPasswordActivity"/>
+        <activity android:name=".LoginActivity"/>
+        <activity android:name=".QuestionActivity"/>
+        <activity android:name=".DetailActivity"/>
+        <activity android:name=".ShareActivity"/>
+        <activity android:name=".WebViewActivity" android:theme="@style/Theme.NoTitleBar" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"

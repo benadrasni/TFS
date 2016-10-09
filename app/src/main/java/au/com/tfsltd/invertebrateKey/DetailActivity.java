@@ -111,6 +111,7 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
         fabPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                hideFAB();
                 dispatchTakePictureIntent();
             }
         });
@@ -118,7 +119,8 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
         fabShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplication(), "Floating Action Button 3", Toast.LENGTH_SHORT).show();
+                hideFAB();
+                callShareActivity();
             }
         });
 
@@ -176,6 +178,8 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
 
             final Observation observation = new Observation();
+            observation.setPhotoPath(path + mCurrentPhotoUri.getLastPathSegment());
+            observation.setDate(date);
             if (mLastLocation != null) {
                 observation.setLatitude(mLastLocation.getLatitude());
                 observation.setLongitude(mLastLocation.getLongitude());
@@ -191,19 +195,22 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
                 uploadTask.addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
-                        observation.setPhotoPath(path + mCurrentPhotoUri.getLastPathSegment());
+                        observation.setUploaded(false);
                         saveObservation(observation);
+                        Toast.makeText(getApplication(), "Photo saved", Toast.LENGTH_SHORT).show();
+                        callShareActivity();
                     }
                 }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        observation.setPhotoPath(path + mCurrentPhotoUri.getLastPathSegment());
+                        observation.setUploaded(true);
                         saveObservation(observation);
+                        Toast.makeText(getApplication(), "Photo saved and uploaded", Toast.LENGTH_SHORT).show();
+                        callShareActivity();
                     }
                 });
 
             } else {
-                observation.setPhotoPath(path + mCurrentPhotoUri.getLastPathSegment());
                 saveObservation(observation);
             }
         }
@@ -212,9 +219,10 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    Constants.MY_PERMISSIONS_REQUEST_FINE_LOCATION);
             return;
         }
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
@@ -228,6 +236,18 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case Constants.MY_PERMISSIONS_REQUEST_FINE_LOCATION: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                        && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                }
+            }
+        }
     }
 
     private ImageView createPhotoImage(final String photoPath) {
@@ -291,7 +311,7 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
 
     private File createImageFile() throws IOException {
         date = new Date();
-        path = Constants.PATH_SEPARATOR + userId + Constants.PATH_SEPARATOR + date.getTime() + Constants.PATH_SEPARATOR;
+        path = Constants.PATH_SEPARATOR + userId + Constants.PATH_SEPARATOR;
 
         String imageFileName = "JPEG_" + date.getTime() + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES + path);
@@ -327,9 +347,14 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
         assert auth.getCurrentUser() != null;
         String userUid = auth.getCurrentUser().getUid();
 
-        long time = new Date().getTime();
+        DatabaseReference o = mFirebaseRef.child(Constants.FIELD_OBSERVATIONS).child(userUid).child(possibleAnswers).push();
+        o.setValue(observation);
+    }
 
-        mFirebaseRef.child(Constants.FIELD_OBSERVATIONS).child(userUid).child(possibleAnswers).child("" + time).setValue(observation);
+    private void callShareActivity() {
+        Intent intent = new Intent(DetailActivity.this, ShareActivity.class);
+        intent.putExtra(Constants.PATH, Constants.FIELD_OBSERVATIONS + Constants.PATH_SEPARATOR + userId + Constants.PATH_SEPARATOR + possibleAnswers);
+        startActivity(intent);
     }
 
 }
