@@ -10,6 +10,7 @@ import java.util.Date;
 
 public class Observation {
 
+    private String id;
     private Date date;
     private double longitude;
     private double latitude;
@@ -17,6 +18,13 @@ public class Observation {
     private boolean uploaded;
     private boolean sent;
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public Date getDate() {
         return date;

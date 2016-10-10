@@ -215,6 +215,8 @@ public class StorageLoadingActivity extends AppCompatActivity {
                 public void onFailure(@NonNull Exception exception) {
                 }
             });
+
+            DatabaseReference ref = database.getReference(Constants.FIELD_OBSERVATIONS + Constants.PATH_SEPARATOR + userUid);
         } else {
             callQuestionActivity();
         }

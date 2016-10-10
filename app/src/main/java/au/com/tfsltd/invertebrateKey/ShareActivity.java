@@ -47,6 +47,8 @@ public class ShareActivity extends AppCompatActivity {
     private List<Observation> observations;
     private List<Boolean> checks;
 
+    private DatabaseReference ref;
+
     private SimpleDateFormat sdf = new SimpleDateFormat();
 
     FloatingActionButton fabMail;
@@ -78,6 +80,7 @@ public class ShareActivity extends AppCompatActivity {
                     observations.clear();
                     for (DataSnapshot postSnapshot: snapshot.getChildren()) {
                         Observation observation = postSnapshot.getValue(Observation.class);
+                        observation.setId(postSnapshot.getKey());
                         observations.add(0, observation);
                         checks.add(0, !observation.isSent());
                     }
@@ -177,7 +180,8 @@ public class ShareActivity extends AppCompatActivity {
         observationList.setLayoutManager(layoutManager);
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        ObservationAdapter observationAdapter = new ObservationAdapter(database.getReference(path));
+        ref = database.getReference(path);
+        ObservationAdapter observationAdapter = new ObservationAdapter(ref);
         observationList.setAdapter(observationAdapter);
     }
 
@@ -197,6 +201,7 @@ public class ShareActivity extends AppCompatActivity {
         final StringBuilder text = new StringBuilder();
         ArrayList<Uri> uris = new ArrayList<>();
         for (Observation observation : observations) {
+            ref.child(observation.getId()).child(Constants.FIELD_SENT).setValue(true);
 
             text.append(observation.getPhotoPath().substring(observation.getPhotoPath().lastIndexOf(Constants.PATH_SEPARATOR)));
             text.append("<br/>");

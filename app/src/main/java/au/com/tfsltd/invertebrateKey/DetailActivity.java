@@ -95,7 +95,6 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
         showFabShare = AnimationUtils.loadAnimation(getApplication(), R.anim.fab_share_show);
         hideFabShare = AnimationUtils.loadAnimation(getApplication(), R.anim.fab_share_hide);
 
-
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -104,7 +103,6 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
                 } else {
                     expandFAB();
                 }
-                FAB_Status = !FAB_Status;
             }
         });
 
@@ -289,6 +287,7 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
         fabShare.setLayoutParams(layoutParamsShare);
         fabShare.startAnimation(showFabShare);
         fabShare.setClickable(true);
+        FAB_Status = true;
     }
 
 
@@ -307,6 +306,7 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
         fabShare.startAnimation(hideFabShare);
         fabShare.setClickable(false);
         fabShare.setVisibility(View.INVISIBLE);
+        FAB_Status = false;
     }
 
     private File createImageFile() throws IOException {

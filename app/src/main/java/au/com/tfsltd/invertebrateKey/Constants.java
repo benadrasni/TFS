@@ -33,6 +33,7 @@ public class Constants {
     public final static String FIELD_PHOTOS = "photos";
 
     public final static String FIELD_OBSERVATIONS = "observations";
+    public final static String FIELD_SENT = "sent";
 
     public final static String EMAIL = "benadrasni@gmail.com";
 }
