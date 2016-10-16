@@ -28,4 +28,8 @@
     <string name="email_subject">Invertebrate observation</string>
     <string name="email_sending">Send email ...</string>
 
+    <string name="photo_saved">Photo saved</string>
+    <string name="photo_saved_uploaded">Photo saved and uploaded</string>
+    <string name="photo_saved_not_uploaded">Photo saved, not uploaded</string>
+
 </resources>

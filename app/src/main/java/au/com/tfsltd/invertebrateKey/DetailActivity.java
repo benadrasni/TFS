@@ -195,7 +195,7 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
                     public void onFailure(@NonNull Exception exception) {
                         observation.setUploaded(false);
                         saveObservation(observation);
-                        Toast.makeText(getApplication(), "Photo saved", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplication(), getResources().getString(R.string.photo_saved_not_uploaded), Toast.LENGTH_SHORT).show();
                         callShareActivity();
                     }
                 }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -203,13 +203,14 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         observation.setUploaded(true);
                         saveObservation(observation);
-                        Toast.makeText(getApplication(), "Photo saved and uploaded", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplication(), getResources().getString(R.string.photo_saved_uploaded), Toast.LENGTH_SHORT).show();
                         callShareActivity();
                     }
                 });
 
             } else {
                 saveObservation(observation);
+                Toast.makeText(getApplication(), getResources().getString(R.string.photo_saved), Toast.LENGTH_SHORT).show();
             }
         }
     }
