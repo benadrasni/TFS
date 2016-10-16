@@ -1,11 +1,12 @@
 package au.com.tfsltd.invertebrateKey;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -21,6 +22,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -217,6 +219,46 @@ public class StorageLoadingActivity extends AppCompatActivity {
             });
 
             DatabaseReference ref = database.getReference(Constants.FIELD_OBSERVATIONS + Constants.PATH_SEPARATOR + userUid);
+            ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    FirebaseStorage storage = FirebaseStorage.getInstance();
+                    StorageReference storageRef = storage.getReferenceFromUrl(Constants.STORAGE);
+                    for (DataSnapshot postSnapshot: snapshot.getChildren()) {
+                        for (final DataSnapshot observationSnapshot: postSnapshot.getChildren()) {
+                            final Observation observation = observationSnapshot.getValue(Observation.class);
+                            if (!observation.isUploaded()) {
+
+                                File photoFile = getExternalFilesDir(Environment.DIRECTORY_PICTURES + observation.getPhotoPath());
+                                Uri photoURI = FileProvider.getUriForFile(StorageLoadingActivity.this, "au.com.tfsltd.invertebrateKey.fileprovider",
+                                        photoFile);
+
+                                StorageReference imagesRef = storageRef.child(Constants.PHOTOS_STORAGE + observation.getPhotoPath());
+
+                                UploadTask uploadTask = imagesRef.putFile(photoURI);
+                                uploadTask.addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception exception) {
+                                    }
+                                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                    @Override
+                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                        observationSnapshot.child(Constants.FIELD_UPLOADED).getRef().setValue(true);
+                                    }
+                                });
+
+                            }
+                        }
+
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
         } else {
             callQuestionActivity();
         }

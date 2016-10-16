@@ -34,6 +34,7 @@ public class Constants {
 
     public final static String FIELD_OBSERVATIONS = "observations";
     public final static String FIELD_SENT = "sent";
+    public final static String FIELD_UPLOADED = "uploaded";
 
     public final static String EMAIL = "benadrasni@gmail.com";
 }

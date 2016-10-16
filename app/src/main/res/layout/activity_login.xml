@@ -19,7 +19,7 @@
             android:layout_height="@dimen/logo_w_h"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="30dp"
-            android:src="@drawable/tfs_logo"
+            android:src="@drawable/logo"
             android:contentDescription="@string/desc_logo"/>
 
         <android.support.design.widget.TextInputLayout
