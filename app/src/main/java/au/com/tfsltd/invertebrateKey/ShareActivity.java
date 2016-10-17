@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -136,7 +137,8 @@ public class ShareActivity extends AppCompatActivity {
                         ((TFSApp) getApplication()).addBitmapToMemoryCache(observation.getPhotoPath(), myBitmap);
                         holder.photo.setImageBitmap(myBitmap);
                     } else {
-                        holder.photo.setImageDrawable(getDrawable(R.drawable.no_image_available));
+                        holder.photo.setImageDrawable(ContextCompat.getDrawable(ShareActivity.this.getApplicationContext(),
+                                R.drawable.no_image_available));
                     }
                 }
             } else {

@@ -15,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -267,6 +268,8 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
                         Constants.IMAGE_SIZE, Constants.IMAGE_SIZE);
                 ((TFSApp) getApplication()).addBitmapToMemoryCache(imageKey, myBitmap);
                 photo.setImageBitmap(myBitmap);
+            } else {
+                photo.setImageDrawable(ContextCompat.getDrawable(this.getApplicationContext(), R.drawable.no_image_available));
             }
         } else {
             photo.setImageBitmap(myBitmap);
