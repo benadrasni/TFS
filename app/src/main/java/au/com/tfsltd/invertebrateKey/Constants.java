@@ -7,7 +7,8 @@ package au.com.tfsltd.invertebrateKey;
  */
 public class Constants {
     public final static int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 0;
-    public final static int THUMBNAIL_SIZE = 128;
+    public final static int PHOTO_SIZE = 128;
+    public final static int IMAGE_SIZE = 512;
 
     public final static String GOOGLE_MAPS = "http://www.google.com/maps/place/";
     public final static String ZOOM = "17z";

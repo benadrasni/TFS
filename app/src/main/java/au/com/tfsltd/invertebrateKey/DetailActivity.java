@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -262,7 +263,8 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
         if (myBitmap == null) {
             File imgFile = new File(this.getApplicationContext().getFilesDir() + imageKey);
             if (imgFile.exists()) {
-                myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                myBitmap = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(imgFile.getAbsolutePath()),
+                        Constants.IMAGE_SIZE, Constants.IMAGE_SIZE);
                 ((TFSApp) getApplication()).addBitmapToMemoryCache(imageKey, myBitmap);
                 photo.setImageBitmap(myBitmap);
             }

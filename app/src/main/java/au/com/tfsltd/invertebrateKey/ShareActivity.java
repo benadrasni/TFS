@@ -131,9 +131,13 @@ public class ShareActivity extends AppCompatActivity {
                 File imgFile = getExternalFilesDir(Environment.DIRECTORY_PICTURES + observation.getPhotoPath());
                 if (imgFile != null && imgFile.exists()) {
                     myBitmap = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(imgFile.getAbsolutePath()),
-                            Constants.THUMBNAIL_SIZE, Constants.THUMBNAIL_SIZE);
-                    ((TFSApp) getApplication()).addBitmapToMemoryCache(observation.getPhotoPath(), myBitmap);
-                    holder.photo.setImageBitmap(myBitmap);
+                            Constants.PHOTO_SIZE, Constants.PHOTO_SIZE);
+                    if (myBitmap != null) {
+                        ((TFSApp) getApplication()).addBitmapToMemoryCache(observation.getPhotoPath(), myBitmap);
+                        holder.photo.setImageBitmap(myBitmap);
+                    } else {
+                        holder.photo.setImageDrawable(getDrawable(R.drawable.no_image_available));
+                    }
                 }
             } else {
                 holder.photo.setImageBitmap(myBitmap);
