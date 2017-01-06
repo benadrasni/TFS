@@ -264,8 +264,9 @@ public class DetailActivity extends AppCompatActivity implements GoogleApiClient
         if (myBitmap == null) {
             File imgFile = new File(this.getApplicationContext().getFilesDir() + imageKey);
             if (imgFile.exists()) {
-                myBitmap = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(imgFile.getAbsolutePath()),
-                        Constants.IMAGE_SIZE, Constants.IMAGE_SIZE);
+//                myBitmap = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(imgFile.getAbsolutePath()),
+//                        Constants.IMAGE_SIZE, Constants.IMAGE_SIZE);
+                myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
                 ((TFSApp) getApplication()).addBitmapToMemoryCache(imageKey, myBitmap);
                 photo.setImageBitmap(myBitmap);
             } else {
