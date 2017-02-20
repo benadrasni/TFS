@@ -97,9 +97,6 @@ public class QuestionActivity extends AppCompatActivity {
 
     private LinearLayout createAnswerLayout(final Map answer, final int i, boolean isInGrid) {
         final LinearLayout answerLayout = (LinearLayout) LayoutInflater.from(this.getApplicationContext()).inflate(R.layout.answer, null);
-//        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-//        p.weight = 1;
-//        answerLayout.setLayoutParams(p);
 
         final TextView textView = (TextView) answerLayout.findViewById(R.id.answer_text);
         textViews[i-1] = textView;
@@ -109,7 +106,7 @@ public class QuestionActivity extends AppCompatActivity {
             public void run() {
                 lineCounts[i-1] = textView.getLineCount();
                 count++;
-                if (count == answers.size()-1) {
+                if (count == answers.size()) {
                     for(int i = 1; i < answers.size(); i += 2) {
 
                         int lineCount = Math.max(lineCounts[i], lineCounts[i-1]);

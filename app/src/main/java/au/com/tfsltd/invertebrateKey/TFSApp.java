@@ -52,6 +52,10 @@ public class TFSApp extends Application {
         return mMemoryCache.get(key);
     }
 
+    public void clearMemCache() {
+        mMemoryCache.evictAll();
+    }
+
     public boolean isNetworkAvailable(final Context context) {
         final ConnectivityManager connectivityManager = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
         return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();

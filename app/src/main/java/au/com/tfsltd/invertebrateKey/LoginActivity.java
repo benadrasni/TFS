@@ -1,8 +1,12 @@
 package au.com.tfsltd.invertebrateKey;
 
+import android.*;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -14,7 +18,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class LoginActivity extends StorageLoadingActivity {
+public class LoginActivity extends AppCompatActivity {
 
     private EditText inputEmail, inputPassword;
     private FirebaseAuth auth;
@@ -68,11 +72,34 @@ public class LoginActivity extends StorageLoadingActivity {
                                 Toast.makeText(LoginActivity.this, getString(R.string.auth_failed), Toast.LENGTH_LONG).show();
                             }
                         } else {
-                            loadQuestionActivity();
+                            if (ActivityCompat.checkSelfPermission(LoginActivity.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+                                ActivityCompat.requestPermissions(LoginActivity.this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                        Constants.MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+                            } else {
+                                callSplashActivity();
+                            }
                         }
                     }
                 });
             }
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        if (ActivityCompat.checkSelfPermission(LoginActivity.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Permission to storage is required", Toast.LENGTH_SHORT).show();
+            auth.signOut();
+            finish();
+        } else {
+            callSplashActivity();
+        }
+    }
+
+    private void callSplashActivity() {
+        Intent intent = new Intent(LoginActivity.this, SplashActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

@@ -181,8 +181,10 @@ public class StorageLoadingActivity extends AppCompatActivity {
                                 progressDialog.setMessage(getResources().getString(R.string.downloading_photos));
                                 progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                                 progressDialog.setProgress(0);
-                                progressDialog.setMax(1);
+                                progressDialog.setMax((int)storageMetadata.getSizeBytes()/1024/1024);
                                 progressDialog.show();
+
+                                ((TFSApp)getApplication()).clearMemCache();
 
                                 photosReference.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                                     @Override

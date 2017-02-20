@@ -7,6 +7,7 @@ package au.com.tfsltd.invertebrateKey;
  */
 public class Constants {
     public final static int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 0;
+    public final static int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
     public final static int PHOTO_SIZE = 128;
     public final static int IMAGE_SIZE = 512;
 
