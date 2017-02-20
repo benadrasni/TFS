@@ -28,6 +28,8 @@ import java.util.Map;
  */
 public class QuestionActivity extends AppCompatActivity {
 
+    private static double IMAGE_HEIGHT_FACTOR = 0.7;
+
     private String path;
     private int[] lineCounts;
     private TextView[] textViews;
@@ -95,6 +97,10 @@ public class QuestionActivity extends AppCompatActivity {
 
     private LinearLayout createAnswerLayout(final Map answer, final int i, boolean isInGrid) {
         final LinearLayout answerLayout = (LinearLayout) LayoutInflater.from(this.getApplicationContext()).inflate(R.layout.answer, null);
+//        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+//        p.weight = 1;
+//        answerLayout.setLayoutParams(p);
+
         final TextView textView = (TextView) answerLayout.findViewById(R.id.answer_text);
         textViews[i-1] = textView;
         textView.setText((String)answer.get(Constants.FIELD_TEXT));
@@ -119,11 +125,11 @@ public class QuestionActivity extends AppCompatActivity {
         if (isInGrid) {
             int size = (int) ((dm.widthPixels - 2 * this.getResources().getDimension(R.dimen.card_view_margin) - 4 * this.getResources().getDimension(R.dimen.answer_margin)) / 2);
             photoView.getLayoutParams().width = size;
-            photoView.getLayoutParams().height = size;
+            photoView.getLayoutParams().height = (int) (size * IMAGE_HEIGHT_FACTOR);
         } else {
             int size = (int) (dm.widthPixels - 2 * this.getResources().getDimension(R.dimen.card_view_margin) - 2 * this.getResources().getDimension(R.dimen.answer_margin));
             photoView.getLayoutParams().width = size;
-            photoView.getLayoutParams().height = size / 4;
+            photoView.getLayoutParams().height = (int) (size * IMAGE_HEIGHT_FACTOR / 4);
         }
 
         String imageKey = Constants.PATH_SEPARATOR + Constants.ANSWER_DIR + Constants.PATH_SEPARATOR + answer.get(Constants.FIELD_PHOTO);
