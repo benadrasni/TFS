@@ -12,7 +12,7 @@
         android:layout_marginRight="@dimen/answer_margin"
         android:layout_marginLeft="@dimen/answer_margin"
         android:background="@drawable/border_top"
-        android:scaleType="centerCrop"/>
+        android:scaleType="fitCenter"/>
 
     <TextView
         android:id="@+id/answer_text"
