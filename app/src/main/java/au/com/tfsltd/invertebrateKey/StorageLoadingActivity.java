@@ -65,9 +65,8 @@ public class StorageLoadingActivity extends AppCompatActivity {
             try {
                 ZipFile zf = new ZipFile(_zipFile.getAbsolutePath());
                 _size = zf.size();
-                progressDialog.setMax(_size);
             } catch (IOException e) {
-                progressDialog.setMax(1);
+                e.printStackTrace();
             }
         }
 
@@ -181,7 +180,6 @@ public class StorageLoadingActivity extends AppCompatActivity {
                                 progressDialog.setMessage(getResources().getString(R.string.downloading_photos));
                                 progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                                 progressDialog.setProgress(0);
-                                progressDialog.setMax((int)storageMetadata.getSizeBytes()/1024/1024);
                                 progressDialog.show();
 
                                 ((TFSApp)getApplication()).clearMemCache();
@@ -199,6 +197,7 @@ public class StorageLoadingActivity extends AppCompatActivity {
                                 }).addOnProgressListener(new OnProgressListener<FileDownloadTask.TaskSnapshot>() {
                                     @Override
                                     public void onProgress(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                        @SuppressWarnings("VisibleForTests")
                                         int progress = (int) (100.0 * ((float) taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount()));
                                         progressDialog.setProgress(progress);
                                     }
