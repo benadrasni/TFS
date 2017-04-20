@@ -37,6 +37,26 @@
             android:clickable="true"
             android:textColor="@color/colorPrimaryDark"/>
 
+        <TextView
+            android:id="@+id/observation_latitude"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/answer_margin"
+            android:layout_marginRight="@dimen/answer_margin"
+            android:layout_marginLeft="@dimen/answer_margin"
+            android:gravity="start"
+            android:textColor="@color/colorPrimaryDark"/>
+
+        <TextView
+            android:id="@+id/observation_longitude"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/answer_margin"
+            android:layout_marginRight="@dimen/answer_margin"
+            android:layout_marginLeft="@dimen/answer_margin"
+            android:gravity="start"
+            android:textColor="@color/colorPrimaryDark"/>
+
     </LinearLayout>
 
     <ImageView

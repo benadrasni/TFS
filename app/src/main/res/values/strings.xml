@@ -24,6 +24,8 @@
     <string name="first_question">How many legs does it have, if any?</string>
 
     <string name="map">Location</string>
+    <string name="latitude">Latitude:</string>
+    <string name="longitude">Longitude:</string>
 
     <string name="email_subject">Invertebrate observation</string>
     <string name="email_sending">Send email ...</string>

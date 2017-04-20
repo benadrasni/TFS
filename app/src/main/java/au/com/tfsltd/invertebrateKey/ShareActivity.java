@@ -61,12 +61,16 @@ public class ShareActivity extends AppCompatActivity {
             TextView date;
             Button location;
             ImageView photo;
+            TextView latitude;
+            TextView longitude;
 
             ObservationHolder(View v) {
                 super(v);
 
                 checkBox = (CheckBox) v.findViewById(R.id.observation_check);
                 date = (TextView) v.findViewById(R.id.observation_date);
+                latitude = (TextView) v.findViewById(R.id.observation_latitude);
+                longitude = (TextView) v.findViewById(R.id.observation_longitude);
                 location = (Button) v.findViewById(R.id.observation_location);
                 photo = (ImageView) v.findViewById(R.id.observation_photo);
             }
@@ -120,6 +124,8 @@ public class ShareActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
             });
+            holder.latitude.setText(getResources().getString(R.string.latitude) + " " + observation.getLatitude());
+            holder.longitude.setText(getResources().getString(R.string.longitude) + " " + observation.getLongitude());
 
             DisplayMetrics dm = getResources().getDisplayMetrics();
             int size = (int) ((dm.widthPixels - 2 * getResources().getDimension(R.dimen.card_view_margin) - 4 * getResources().getDimension(R.dimen.answer_margin)) / 2);
@@ -218,6 +224,10 @@ public class ShareActivity extends AppCompatActivity {
             text.append("\">");
             text.append(getResources().getString(R.string.map));
             text.append("</a>");
+            text.append("<br/>");
+            text.append(getResources().getString(R.string.latitude)).append(" ").append(observation.getLatitude());
+            text.append("<br/>");
+            text.append(getResources().getString(R.string.longitude)).append(" ").append(observation.getLongitude());
             text.append("<br/><br/>");
 
             File file = getExternalFilesDir(Environment.DIRECTORY_PICTURES + observation.getPhotoPath());
